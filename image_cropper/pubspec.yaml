@@ -15,6 +15,9 @@ flutter:
         pluginClass: ImageCropperPlugin
       ios:
         pluginClass: FLTImageCropperPlugin
+      ohos:
+        package: vn.hunghd.flutter.plugins.imagecropper
+        pluginClass: ImagecropperOhosPlugin
       web:
         default_package: image_cropper_for_web
 

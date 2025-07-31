@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-
+import '/crop_page.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -279,6 +279,40 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _cropImage() async {
+    if(defaultTargetPlatform == TargetPlatform.ohos){
+  if (_pickedFile == null) return;
+    
+    try {
+      final result = await Navigator.push<String?>(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CropWidget(
+            imagePath: _pickedFile!.path,
+            onCropped: (String? croppedPath) {
+              if (croppedPath != null) {
+                setState(() {
+                  _croppedFile = CroppedFile(croppedPath);
+                });
+              }
+            },
+          ),
+        ),
+      );
+      
+      if (result != null) {
+        setState(() {
+          _croppedFile = CroppedFile(result);
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('裁剪失败: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+    }else{
     if (_pickedFile != null) {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: _pickedFile!.path,
@@ -323,6 +357,9 @@ class _HomePageState extends State<HomePage> {
         });
       }
     }
+    }
+
+
   }
 
   Future<void> _uploadImage() async {
