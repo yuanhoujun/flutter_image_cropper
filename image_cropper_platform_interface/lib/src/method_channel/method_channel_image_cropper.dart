@@ -170,3 +170,147 @@ class MethodChannelImageCropper extends ImageCropperPlatform {
     return resultPath == null ? null : CroppedFile(resultPath);
   }
 }
+
+/// An implementation of [ImagecropperOhosPlatform] that uses method channels.
+class MethodChannelImagecropperOhos extends ImageCropperPlatform {
+  /// The method channel used to interact with the native platform.
+  @visibleForTesting
+  final methodChannel = const MethodChannel('imagecropper');
+
+  Future<String?> sampleImage({
+    required String path,
+    required int maximumSize,
+  }) async {
+    String? sampleFile = await methodChannel.invokeMethod<String>('sampleImage',<String,dynamic>{
+      'path':path,
+      'maximumWidth':maximumSize,
+      'maximumHeight':maximumSize,
+    });
+    return sampleFile;
+  }
+
+  @override
+  Future<CroppedFile?> cropImage({
+    required String sourcePath,
+    int? maxWidth,
+    int? maxHeight,
+    CropAspectRatio? aspectRatio,
+    ImageCompressFormat compressFormat = ImageCompressFormat.jpg,
+    int compressQuality = 90,
+    List<PlatformUiSettings>? uiSettings,
+    BuildContext? context,
+  }) async {
+    assert(await File(sourcePath).exists());
+    assert(maxWidth == null || maxWidth > 0);
+    assert(maxHeight == null || maxHeight > 0);
+    assert(compressQuality >= 0 && compressQuality <= 100);
+
+    final arguments = <String, dynamic>{
+      'source_path': sourcePath,
+      'max_width': maxWidth,
+      'max_height': maxHeight,
+      'ratio_x': aspectRatio?.ratioX,
+      'ratio_y': aspectRatio?.ratioY,
+      'compress_format': compressFormat.name,
+      'compress_quality': compressQuality,
+    };
+    BuildContext? extractedContext;
+    if (uiSettings != null) {
+      for (final settings in uiSettings) {
+        arguments.addAll(settings.toMap());
+        if (settings is WebUiSettings && settings.context != null) {
+            extractedContext = settings.context;
+              break; 
+        }
+      }
+    }
+    final contextToUse = context ?? extractedContext;
+     if ( contextToUse != null) {
+      // 鸿蒙平台的处理逻辑
+      final completer = Completer<CroppedFile?>();
+    
+      try {
+        final result = await Navigator.push<String?>(
+          contextToUse,
+          MaterialPageRoute(
+            builder: (contextToUse) => CropWidget(
+              imagePath: sourcePath,
+              onCropped: (String? croppedPath) {
+                if (croppedPath != null) {
+                  completer.complete(CroppedFile(croppedPath));
+                } else {
+                  completer.complete(null);
+                }
+              },
+            ),
+          ),
+        );
+        
+        // 如果 Navigator.push 直接返回结果
+        if (result != null) {
+          return CroppedFile(result);
+        }
+        
+        // 等待 completer 完成
+        return await completer.future;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  // 添加鸿蒙专用的 cropImage 方法（返回 String 路径）
+  Future<String?> cropImageOhos({
+    required String sourcePath,
+    required Rect area,
+    double? scale,
+    double? angle,
+    double? cx,
+    double? cy,
+  }) async {
+    final path = await methodChannel.invokeMethod<String>('cropImage',{
+      'path': sourcePath,
+      'left': area.left,
+      'top': area.top,
+      'right': area.right,
+      'bottom': area.bottom,
+      'scale': scale ?? 1.0,
+      'angle': angle ?? 0,
+      'cx': cx ?? 0,
+      'cy': cy ?? 0,
+    });
+    return path;
+  }
+
+  // 保留原有的 cropImageChannel 方法作为别名
+  Future<String?> cropImageChannel({
+    required String sourcePath,
+    required Rect area,
+    double? scale,
+    double? angle,
+    double? cx,
+    double? cy,
+  }) async {
+    return cropImageOhos(
+      sourcePath: sourcePath,
+      area: area,
+      scale: scale,
+      angle: angle,
+      cx: cx,
+      cy: cy,
+    );
+  }
+  
+  @override
+  Future<CroppedFile?> recoverImage() async {
+    final path = await methodChannel.invokeMethod<String>('recoverImage');
+    return path != null ? CroppedFile(path) : null;
+  }
+
+  // 添加鸿蒙专用的 recoverImage 方法（返回 String 路径）
+  Future<String?> recoverImageOhos() async {
+    final path = await methodChannel.invokeMethod<String>('recoverImage');
+    return path;
+  }
+}

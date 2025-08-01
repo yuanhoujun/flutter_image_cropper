@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:image_cropper_platform_interface/src/models/cropped_file/imagecropper_ohos.dart';
 import 'package:image_cropper_platform_interface/src/models/cropped_file/crop.dart';
 import 'dart:io';
-import 'dart:ui';
 
 class CropWidget extends StatefulWidget {
   final String imagePath;

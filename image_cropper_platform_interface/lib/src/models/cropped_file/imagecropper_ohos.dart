@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'dart:ui';
 
-import '../../platform_interface/imagecropper_ohos_platform_interface.dart';
+import '../../platform_interface/image_cropper_platform.dart';
+
 
 class ImagecropperOhos {
 
@@ -9,7 +10,7 @@ class ImagecropperOhos {
     required String path,
     required int maximumSize,
   }) async {
-    String? filePath = await ImagecropperOhosPlatform.instance.sampleImage(path: path,maximumSize: maximumSize);
+    String? filePath = await ImageCropperPlatform.instance.sampleImage(path: path,maximumSize: maximumSize);
     return File(filePath!);
   }
 
@@ -21,7 +22,7 @@ class ImagecropperOhos {
     double? cx,
     double? cy,
   }) async {
-    String? path = await ImagecropperOhosPlatform.instance.cropImage(
+    String? path = await ImageCropperPlatform.instance.cropImageOhos(
       sourcePath: file.path,
       area: area,
       scale: scale,
@@ -33,6 +34,8 @@ class ImagecropperOhos {
   }
 
   Future<String?> recoverImage() async {
-    return await ImagecropperOhosPlatform.instance.recoverImage();
+    return await ImageCropperPlatform.instance.recoverImageOhos();
   }
+
+
 }
