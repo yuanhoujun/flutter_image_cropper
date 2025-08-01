@@ -4,7 +4,6 @@
 
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../../image_cropper_platform_interface.dart';
@@ -70,7 +69,6 @@ abstract class ImageCropperPlatform extends PlatformInterface {
     ImageCompressFormat compressFormat = ImageCompressFormat.jpg,
     int compressQuality = 90,
     List<PlatformUiSettings>? uiSettings,
-    BuildContext? context, // 添加这个参数
   }) {
     throw UnimplementedError('cropImage() has not been implemented.');
   }
@@ -120,28 +118,5 @@ abstract class ImageCropperPlatform extends PlatformInterface {
   ///
   Future<CroppedFile?> recoverImage() {
     throw UnimplementedError('recoverImage() has not been implemented.');
-  }
-
-
-   Future<String?> sampleImage({
-    required String path,
-    required int maximumSize,
-  }) {
-    throw UnimplementedError('sampleImage() has not been implemented.');
-  }
-
-  Future<String?> cropImageOhos({
-    required String sourcePath,
-    required Rect area,
-    double? scale,
-    double? angle,
-    double? cx,
-    double? cy,
-  }) {
-    throw UnimplementedError('platformVersion() has not been implemented.');
-  }
-
-  Future<String?> recoverImageOhos() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
   }
 }

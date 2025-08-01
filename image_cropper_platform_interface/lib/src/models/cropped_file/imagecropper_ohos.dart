@@ -1,16 +1,19 @@
 import 'dart:io';
-import 'dart:ui';
 
-import '../../platform_interface/image_cropper_platform.dart';
+import 'package:flutter/services.dart';
 
 
 class ImagecropperOhos {
-
+  final methodChannel = const MethodChannel('imagecropper');
   Future<File?> sampleImage({
     required String path,
     required int maximumSize,
   }) async {
-    String? filePath = await ImageCropperPlatform.instance.sampleImage(path: path,maximumSize: maximumSize);
+      String? filePath = await methodChannel.invokeMethod<String>('sampleImage',<String,dynamic>{
+      'path':path,
+      'maximumWidth':maximumSize,
+      'maximumHeight':maximumSize,
+    });
     return File(filePath!);
   }
 
@@ -22,20 +25,31 @@ class ImagecropperOhos {
     double? cx,
     double? cy,
   }) async {
-    String? path = await ImageCropperPlatform.instance.cropImageOhos(
-      sourcePath: file.path,
-      area: area,
-      scale: scale,
-      angle: angle,
-      cx: cx,
-      cy: cy,
-        );
-    return File(path!);
+      final path = await methodChannel.invokeMethod<String>('cropImage',{
+      'path': file.path,
+      'left': area.left,
+      'top': area.top,
+      'right': area.right,
+      'bottom': area.bottom,
+      'scale': scale ?? 1.0,
+      'angle': angle ?? 0,
+      'cx': cx ?? 0,
+      'cy': cy ?? 0,
+    });
+
+    if (path != null) {
+      return File(path);
+    } else {
+      throw Exception('Image cropping failed');
+    }
   }
 
   Future<String?> recoverImage() async {
-    return await ImageCropperPlatform.instance.recoverImageOhos();
+    final path = await methodChannel.invokeMethod<String>('recoverImage');
+    if (path != null) {
+      return path;
+    } else {
+      throw Exception('Image recovery failed');
+    }
   }
-
-
 }
