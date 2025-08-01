@@ -3,13 +3,14 @@
 // found in the LICENSE file.
 
 import 'dart:io';
+import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:image_cropper_platform_interface/image_cropper_platform_interface.dart';
+import 'package:image_cropper_platform_interface/src/models/cropped_file/crop_page.dart';
 
 const MethodChannel _channel = MethodChannel('plugins.hunghd.vn/image_cropper');
-
 /// An implementation of [ImageCropperPlatform] that uses method channels.
 class MethodChannelImageCropper extends ImageCropperPlatform {
   /// The MethodChannel that is being used by this implementation of the plugin.
@@ -50,6 +51,7 @@ class MethodChannelImageCropper extends ImageCropperPlatform {
     ImageCompressFormat compressFormat = ImageCompressFormat.jpg,
     int compressQuality = 90,
     List<PlatformUiSettings>? uiSettings,
+    BuildContext? context,
   }) async {
     assert(await File(sourcePath).exists());
     assert(maxWidth == null || maxWidth > 0);
@@ -65,13 +67,52 @@ class MethodChannelImageCropper extends ImageCropperPlatform {
       'compress_format': compressFormat.name,
       'compress_quality': compressQuality,
     };
-
+    BuildContext? extractedContext;
     if (uiSettings != null) {
       for (final settings in uiSettings) {
         arguments.addAll(settings.toMap());
+        if (settings is WebUiSettings && settings.context != null) {
+            extractedContext = settings.context;
+              break; 
+        }
+    
       }
     }
-
+    final contextToUse = context ?? extractedContext;
+    // // 检查是否为鸿蒙平台并且提供了 context
+     if (Platform.isOhos && contextToUse != null) {
+      // 鸿蒙平台的处理逻辑
+      final completer = Completer<CroppedFile?>();
+    
+      try {
+        final result = await Navigator.push<String?>(
+          contextToUse,
+          MaterialPageRoute(
+            builder: (contextToUse) => CropWidget(
+              imagePath: sourcePath,
+              onCropped: (String? croppedPath) {
+                if (croppedPath != null) {
+                  completer.complete(CroppedFile(croppedPath));
+                } else {
+                  completer.complete(null);
+                }
+              },
+            ),
+          ),
+        );
+        
+        // 如果 Navigator.push 直接返回结果
+        if (result != null) {
+          return CroppedFile(result);
+        }
+        
+        // 等待 completer 完成
+        return await completer.future;
+      } catch (e) {
+        return null;
+      }
+    }
+    
     final String? resultPath =
         await _channel.invokeMethod('cropImage', arguments);
     return resultPath == null ? null : CroppedFile(resultPath);

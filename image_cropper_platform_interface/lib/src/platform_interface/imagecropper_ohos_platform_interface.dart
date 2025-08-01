@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-import 'imagecropper_ohos_method_channel.dart';
+import '../method_channel/imagecropper_ohos_method_channel.dart';
 
 abstract class ImagecropperOhosPlatform extends PlatformInterface {
   /// Constructs a ImagecropperOhosPlatform.

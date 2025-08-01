@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import 'imagecropper_ohos_platform_interface.dart';
+import '../platform_interface/imagecropper_ohos_platform_interface.dart';
 
 /// An implementation of [ImagecropperOhosPlatform] that uses method channels.
 class MethodChannelImagecropperOhos extends ImagecropperOhosPlatform {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_cropper/imagecropper_ohos.dart';
-import 'package:image_cropper/page/crop.dart';
+import 'package:image_cropper_platform_interface/src/models/cropped_file/imagecropper_ohos.dart';
+import 'package:image_cropper_platform_interface/src/models/cropped_file/crop.dart';
 import 'dart:io';
 import 'dart:ui';
 
@@ -138,13 +138,15 @@ class _CropWidgetState extends State<CropWidget> {
     return Container(
       color: _uCropBackground,
       child: Center(
-        child: Crop(
-          key: _cropKey,
-          image: FileImage(_sampleFile!),
-          aspectRatio: _currentAspectRatio,
-          rotateController: _rotateController,
-          scaleController: _scaleController, // 传递缩放控制器
-          initialScale: _currentScale,
+        child: Container(
+          child: Crop(
+            key: _cropKey,
+            image: FileImage(_sampleFile!),
+            aspectRatio: _currentAspectRatio,
+            rotateController: _rotateController,
+            scaleController: _scaleController, // 传递缩放控制器
+            initialScale: _currentScale,
+          ),
         ),
       ),
     );

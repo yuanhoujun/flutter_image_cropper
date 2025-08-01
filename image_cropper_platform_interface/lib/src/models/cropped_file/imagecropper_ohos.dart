@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
-import 'imagecropper_ohos_platform_interface.dart';
+import '../../platform_interface/imagecropper_ohos_platform_interface.dart';
 
 class ImagecropperOhos {
 

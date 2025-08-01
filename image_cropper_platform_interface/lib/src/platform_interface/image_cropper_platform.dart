@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:flutter/material.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../../image_cropper_platform_interface.dart';
@@ -68,6 +69,7 @@ abstract class ImageCropperPlatform extends PlatformInterface {
     ImageCompressFormat compressFormat = ImageCompressFormat.jpg,
     int compressQuality = 90,
     List<PlatformUiSettings>? uiSettings,
+    BuildContext? context, // 添加这个参数
   }) {
     throw UnimplementedError('cropImage() has not been implemented.');
   }
