@@ -2,10 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:io';
+
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../../image_cropper_platform_interface.dart';
-import '../method_channel/method_channel_image_cropper.dart';
 
 /// The interface that implementations of image_cropper must implement.
 ///
@@ -20,7 +21,7 @@ abstract class ImageCropperPlatform extends PlatformInterface {
 
   static final Object _token = Object();
 
-  static ImageCropperPlatform _instance = MethodChannelImageCropper();
+  static ImageCropperPlatform _instance = Platform.isOhos? MethodChannelImagecropperOhos() : MethodChannelImageCropper();
 
   /// The default instance of [ImageCropperPlatform] to use.
   ///

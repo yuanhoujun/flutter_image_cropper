@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "image_cropper",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ]
+  }
+}

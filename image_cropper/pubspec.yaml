@@ -15,14 +15,20 @@ flutter:
         pluginClass: ImageCropperPlugin
       ios:
         pluginClass: FLTImageCropperPlugin
+      ohos:
+        package: vn.hunghd.flutter.plugins.imagecropper
+        pluginClass: ImagecropperOhosPlugin
       web:
         default_package: image_cropper_for_web
 
 dependencies:
   flutter:
     sdk: flutter
-  image_cropper_platform_interface: ^7.1.0
-  image_cropper_for_web: ^6.1.0
+  # image_cropper_platform_interface: ^7.1.0
+  image_cropper_platform_interface:
+    path: ../image_cropper_platform_interface
+  image_cropper_for_web:
+    path: ../image_cropper_for_web
 
 dev_dependencies:
   flutter_test:
