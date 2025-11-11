@@ -45,6 +45,7 @@ class Crop extends StatefulWidget {
   final RotateController? rotateController;
   final ScaleController? scaleController; // 添加缩放控制器
   final double initialScale;
+  final Function(double angle)? onRotationChanged; // 添加旋转角度变化回调
 
   const Crop({
     Key? key,
@@ -56,6 +57,7 @@ class Crop extends StatefulWidget {
     this.rotateController,
     this.scaleController, // 添加缩放控制器参数
     this.initialScale = 1.0,
+    this.onRotationChanged, // 添加旋转角度变化回调参数
   }) : super(key: key);
 
   Crop.file(
@@ -69,6 +71,7 @@ class Crop extends StatefulWidget {
     this.rotateController,
     this.scaleController, // 添加缩放控制器参数
     this.initialScale = 1.0,
+    this.onRotationChanged, // 添加旋转角度变化回调参数
   })  : image = FileImage(file, scale: scale),
         super(key: key);
 
@@ -84,6 +87,7 @@ class Crop extends StatefulWidget {
     this.rotateController,
     this.scaleController, // 添加缩放控制器参数
     this.initialScale = 1.0,
+    this.onRotationChanged, // 添加旋转角度变化回调参数
   })  : image = AssetImage(assetName, bundle: bundle, package: package),
         super(key: key);
 
@@ -125,10 +129,10 @@ class CropState extends State<Crop> with TickerProviderStateMixin {
   Rect? get area => _view.isEmpty
       ? null
       : Rect.fromLTWH(
-          max(_area.left * _view.width / _scale - _view.left, 0),
-          max(_area.top * _view.height / _scale - _view.top, 0),
-          _area.width * _view.width / _scale,
-          _area.height * _view.height / _scale,
+          max(_area.left * _view.width - _view.left, 0),
+          max(_area.top * _view.height - _view.top, 0),
+          _area.width * _view.width,
+          _area.height * _view.height,
         );
 
   bool get _isEnabled => _view.isEmpty == false && _image != null;
@@ -197,6 +201,11 @@ class CropState extends State<Crop> with TickerProviderStateMixin {
       rotateController.rotate = (double rotationAngle) {
         setState(() {
           angle = rotationAngle;
+          
+          // 通知父组件旋转角度变化
+          if (widget.onRotationChanged != null) {
+            widget.onRotationChanged!(angle);
+          }
         });
       };
     }
@@ -502,11 +511,19 @@ class CropState extends State<Crop> with TickerProviderStateMixin {
     _activate();
     _settleController.stop(canceled: false);
     _lastFocalPoint = details.focalPoint;
-    _action = _CropAction.none;
     _handle = _hitCropHandle(_getLocalPoint(details.focalPoint));
     _startScale = _scale;
     _startView = _view;
     _startAngle = angle;
+    
+    // 根据是否点击了裁剪手柄设置不同的操作模式
+    if (_handle != _CropHandleSide.none) {
+      // 如果点击了裁剪手柄，设置为裁剪模式
+      _action = _CropAction.cropping;
+    } else {
+      // 否则根据触摸点数量设置为移动或缩放模式
+      _action = pointers == 2 ? _CropAction.scaling : _CropAction.moving;
+    }
   }
 
 void _updateViewWithBoundaries(Rect newView) {
@@ -795,53 +812,54 @@ void _updateViewWithBoundaries(Rect newView) {
     if (_action == _CropAction.cropping) {
       final image = _image;
       final boundaries = _boundaries;
-      if (image == null || boundaries == null) {
+      if (image == null || boundaries == null || _handle == _CropHandleSide.none) {
         return;
       }
 
       final delta = details.focalPoint - _lastFocalPoint;
       _lastFocalPoint = details.focalPoint;
-
-      final an = angle / 180 * pi;
-
-      var dx1 = delta.dy * sin(an);
-      var dx2 = delta.dx * cos(an);
-
-      var dy1 = delta.dy * cos(an);
-      var dy2 = -delta.dx * sin(an);
-
-      // 计算新的视图位置，不应用边界约束
-      final newView = _view.translate(
-        (dx1 + dx2) / (image.width * _scale * _ratio),
-        (dy1 + dy2) / (image.height * _scale * _ratio),
-      );
       
-  // 简化的边界约束逻辑
-      final imageWidth = image.width * _scale * _ratio;
-      final imageHeight = image.height * _scale * _ratio;
+      // 根据拖动的手柄和偏移量计算裁剪框的调整值
+      final handle = _handle;
+      final ratio = boundaries.width / boundaries.height;
       
-      // 确保图片完全覆盖裁剪区域
-      final cropRect = Rect.fromLTWH(
-        boundaries.width * _area.left,
-        boundaries.height * _area.top,
-        boundaries.width * _area.width,
-        boundaries.height * _area.height,
-      );
+      // 计算单位偏移量对应的裁剪区域变化
+      final deltaX = delta.dx / boundaries.width;
+      final deltaY = delta.dy / boundaries.height;
       
-      // 计算视图的边界限制
-      final minLeft = (cropRect.left - imageWidth + cropRect.width) / imageWidth;
-      final maxLeft = cropRect.left / imageWidth;
-      final minTop = (cropRect.top - imageHeight + cropRect.height) / imageHeight;
-      final maxTop = cropRect.top / imageHeight;
-      
-      setState(() {
-        _view = Rect.fromLTWH(
-          newView.left.clamp(minLeft, maxLeft),
-          newView.top.clamp(minTop, maxTop),
-          newView.width,
-          newView.height,
-        );
-      });
+      // 根据不同的手柄计算相应的调整值
+      switch (handle) {
+        case _CropHandleSide.topLeft:
+          _updateArea(
+            cropHandleSide: handle,
+            left: deltaX,
+            top: deltaY,
+          );
+          break;
+        case _CropHandleSide.topRight:
+          _updateArea(
+            cropHandleSide: handle,
+            right: deltaX,
+            top: deltaY,
+          );
+          break;
+        case _CropHandleSide.bottomLeft:
+          _updateArea(
+            cropHandleSide: handle,
+            left: deltaX,
+            bottom: deltaY,
+          );
+          break;
+        case _CropHandleSide.bottomRight:
+          _updateArea(
+            cropHandleSide: handle,
+            right: deltaX,
+            bottom: deltaY,
+          );
+          break;
+        default:
+          break;
+      }
 
     } else if (_action == _CropAction.moving) {
       final image = _image;
@@ -885,6 +903,11 @@ void _updateViewWithBoundaries(Rect newView) {
       setState(() {
         _scale = newScale.toDouble();
         angle = _startAngle + details.rotation / pi * 180;
+        
+        // 通知父组件旋转角度变化
+        if (widget.onRotationChanged != null) {
+          widget.onRotationChanged!(angle);
+        }
 
         final dx = boundaries.width *
             (1.0 - details.scale) /
