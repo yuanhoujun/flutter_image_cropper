@@ -145,6 +145,12 @@ class _CropWidgetState extends State<CropWidget> {
             rotateController: _rotateController,
             scaleController: _scaleController, // 传递缩放控制器
             initialScale: _currentScale,
+            onRotationChanged: (double angle) {
+              // 更新当前旋转角度
+              setState(() {
+                _currentRotation = angle % 360; // 保持角度在0-360范围内
+              });
+            },
           ),
         ),
       ),
