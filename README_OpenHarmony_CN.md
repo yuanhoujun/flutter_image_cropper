@@ -6,7 +6,7 @@
 
 
 
-本项目基于 [image_cropper@9.1.0](https://pub.dev/packages/image_cropper/versions/9.1.0) 开发。
+本项目基于 [image_cropper@11.0.0](https://pub.dev/packages/image_cropper/versions/9.1.0) 开发。
 
 ## 1. 安装与使用
 
@@ -26,7 +26,7 @@ dependencies:
     git: 
       url: https://gitcode.com/openharmony-sig/fluttertpc_image_cropper.git
       path: ./image_cropper
-      ref: br_v9.1.0_ohos
+      ref: br_v11.0.0_ohos
 
 ...
 ```
@@ -50,6 +50,7 @@ flutter pub get
 在以下版本中已测试通过
 
 1. Flutter: 3.27.5-ohos-0.0.1; SDK: 5.0.0(12); IDE: DevEco Studio: 5.1.0.828; ROM: 5.1.0.130 SP8;
+2. Flutter: 3.35.7-ohos-0.0.1; SDK: 6.0.1(21); IDE: DevEco Studio: 6.0.1.260; ROM: 6.0.0.120 SP6;
 
 ### 2.2 权限要求
 
