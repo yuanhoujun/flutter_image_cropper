@@ -21,7 +21,7 @@ abstract class ImageCropperPlatform extends PlatformInterface {
 
   static final Object _token = Object();
 
-  static ImageCropperPlatform _instance = Platform.isOhos? MethodChannelImagecropperOhos() : MethodChannelImageCropper();
+  static ImageCropperPlatform _instance = Platform.operatingSystem == "ohos" ? MethodChannelImagecropperOhos() : MethodChannelImageCropper();
 
   /// The default instance of [ImageCropperPlatform] to use.
   ///
