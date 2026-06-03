@@ -11,6 +11,7 @@ import 'package:image_cropper_platform_interface/image_cropper_platform_interfac
 import 'package:image_cropper_platform_interface/src/models/cropped_file/crop_page.dart';
 
 const MethodChannel _channel = MethodChannel('plugins.hunghd.vn/image_cropper');
+const MethodChannel _ohosChannel = MethodChannel('imagecropper');
 /// An implementation of [ImageCropperPlatform] that uses method channels.
 class MethodChannelImageCropper extends ImageCropperPlatform {
   /// The MethodChannel that is being used by this implementation of the plugin.
@@ -202,5 +203,11 @@ class MethodChannelImagecropperOhos extends ImageCropperPlatform {
     }
     return null;
   }
- 
+
+  @override
+  Future<CroppedFile?> recoverImage() async {
+    final String? resultPath =
+        await _ohosChannel.invokeMethod('recoverImage');
+    return resultPath == null ? null : CroppedFile(resultPath);
+  }
 }

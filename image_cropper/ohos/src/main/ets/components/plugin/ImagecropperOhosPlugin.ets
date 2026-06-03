@@ -29,6 +29,10 @@ import fs from '@ohos.file.fs';
 import { HashMap } from '@kit.ArkTS';
 
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
+import preferences from '@ohos.data.preferences';
+
+const FILENAME_CACHE_KEY: string = 'imagecropper.FILENAME_CACHE_KEY';
+const PREFERENCES_NAME: string = 'imagecropper_preferences';
 
 class ImageOptions {
   private width: number = 0;
@@ -65,6 +69,7 @@ class ImageOptions {
 export default class ImagecropPlugin implements FlutterPlugin, MethodCallHandler, AbilityAware {
   private channel?: MethodChannel = undefined;
   private abilityBinding?: AbilityPluginBinding = undefined;
+  private cachedPreferences?: preferences.Preferences = undefined;
 
   constructor() {
   }
@@ -74,7 +79,7 @@ export default class ImagecropPlugin implements FlutterPlugin, MethodCallHandler
   }
 
   onDetachedFromAbility(): void {
-
+    this.cachedPreferences = undefined;
   }
 
   getUniqueClassName(): string {
@@ -90,6 +95,7 @@ export default class ImagecropPlugin implements FlutterPlugin, MethodCallHandler
     if (this.channel != null) {
       this.channel.setMethodCallHandler(null)
     }
+	this.cachedPreferences = undefined;
   }
 
   onMethodCall(call: MethodCall, result: MethodResult): void {
@@ -122,6 +128,8 @@ export default class ImagecropPlugin implements FlutterPlugin, MethodCallHandler
       this.getImageOptions(path, result);
     } else if ("requestPermissions" == call.method) {
       this.requestPermissions(result);
+    } else if ("recoverImage" == call.method) {
+      this.recoverImage(result);
     } else {
       result.notImplemented();
     }
@@ -178,6 +186,12 @@ export default class ImagecropPlugin implements FlutterPlugin, MethodCallHandler
       await pixelMapData.crop(region)
       let dstFile = this.createTemporaryImageFilePath();
       await this.savaPixelMap(pixelMapData, dstFile);
+      try {
+        await this.cacheImage(dstFile);
+      } catch (cacheError) {
+        // 缓存失败不影响裁剪结果返回
+		console.error(`cacheError: ${cacheError}`); 
+      }
       result.success(dstFile);
     } catch (e) {
     }
@@ -209,6 +223,49 @@ export default class ImagecropPlugin implements FlutterPlugin, MethodCallHandler
 
   private requestPermissions(result: MethodResult) {
     result.success(true);
+  }
+
+  private async getPreferences(): Promise<preferences.Preferences | undefined> {
+    if (this.cachedPreferences != undefined) {
+      return this.cachedPreferences;
+    }
+    const context = this.abilityBinding?.getAbility().context;
+    if (context == undefined) {
+      return undefined;
+    }
+    this.cachedPreferences = await preferences.getPreferences(context, PREFERENCES_NAME);
+    return this.cachedPreferences;
+  }
+
+  private async cacheImage(filePath: string): Promise<void> {
+    const prefs = await this.getPreferences();
+    if (prefs == undefined) {
+      return;
+    }
+    await prefs.put(FILENAME_CACHE_KEY, filePath);
+    await prefs.flush();
+  }
+
+  private async getAndClearCachedImage(): Promise<string | null> {
+    const prefs = await this.getPreferences();
+    if (prefs == undefined) {
+      return null;
+    }
+    if (await prefs.has(FILENAME_CACHE_KEY)) {
+      const cachedPath = await prefs.get(FILENAME_CACHE_KEY, '') as string;
+      await prefs.delete(FILENAME_CACHE_KEY);
+      await prefs.flush();
+      return cachedPath.length > 0 ? cachedPath : null;
+    }
+    return null;
+  }
+
+  private recoverImage(result: MethodResult): void {
+    this.getAndClearCachedImage().then((path: string | null) => {
+      result.success(path);
+    }).catch(() => {
+      result.success(null);
+    });
   }
 
   private decodeImageOptions(imageSource: image.ImageSource): Promise<ImageOptions> {

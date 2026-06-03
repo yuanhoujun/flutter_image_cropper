@@ -45,11 +45,6 @@ class ImagecropperOhos {
   }
 
   Future<String?> recoverImage() async {
-    final path = await methodChannel.invokeMethod<String>('recoverImage');
-    if (path != null) {
-      return path;
-    } else {
-      throw Exception('Image recovery failed');
-    }
+    return await methodChannel.invokeMethod<String>('recoverImage');
   }
 }
