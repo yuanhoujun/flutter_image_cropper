@@ -24,7 +24,7 @@
 dependencies:
   image_cropper:
     git: 
-      url: https://gitcode.com/openharmony-sig/fluttertpc_image_cropper.git
+      url: https://gitcode.com/CPF-Flutter/fluttertpc_image_cropper.git
       path: ./image_cropper
       ref: br_v11.0.0_ohos
 
@@ -160,5 +160,5 @@ flutter pub get
 
 ## 7. 开源协议
 
-本项目基于 [BSD-3-Clause](https://gitcode.com/openharmony-sig/fluttertpc_image_cropper/blob/br_v9.1.0_ohos/image_cropper/LICENSE) ，请自由地享受和参与开源。
+本项目基于 [BSD-3-Clause](https://gitcode.com/CPF-Flutter/fluttertpc_image_cropper/blob/br_v9.1.0_ohos/image_cropper/LICENSE) ，请自由地享受和参与开源。
 
