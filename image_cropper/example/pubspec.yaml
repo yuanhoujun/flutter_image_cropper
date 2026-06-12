@@ -21,13 +21,13 @@ dependencies:
   cupertino_icons: ^1.0.4
   image_picker:
     git:
-      url: https://gitee.com/openharmony-sig/flutter_packages.git
+      url: https://gitcode.com/openharmony-tpc/flutter_packages.git
       path: packages/image_picker/image_picker
 
 dependency_overrides:
   image_picker_ohos:
     git:
-      url: https://gitee.com/openharmony-sig/flutter_packages.git
+      url: https://gitcode.com/openharmony-tpc/flutter_packages.git
       path: packages/image_picker/image_picker_ohos
       ref: br_optimize_har_structure
 

@@ -24,7 +24,7 @@ Go to the project directory and add the following dependencies in pubspec.yaml
 dependencies:
   image_cropper:
     git: 
-      url: https://gitcode.com/openharmony-sig/fluttertpc_image_cropper.git
+      url: https://gitcode.com/CPF-Flutter/fluttertpc_image_cropper.git
       path: ./image_cropper
       ref: br_v11.0.0_ohos
 
@@ -159,5 +159,5 @@ Open  `entry/src/main/resources/base/element/string.json` and add the following 
 
 ## 7. License
 
-This project is licensed under [BSD-3-Clause](https://gitcode.com/openharmony-sig/fluttertpc_image_cropper/blob/br_v9.1.0_ohos/image_cropper/LICENSE)
+This project is licensed under [BSD-3-Clause](https://gitcode.com/CPF-Flutter/fluttertpc_image_cropper/blob/br_v9.1.0_ohos/image_cropper/LICENSE)
 
