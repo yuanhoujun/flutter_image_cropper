@@ -95,6 +95,21 @@ class _HomePageState extends State<HomePage> {
   CroppedFile? _croppedFile;
 
   @override
+  void initState() {
+    super.initState();
+    _recoverLostCrop();
+  }
+
+  Future<void> _recoverLostCrop() async {
+    final recoveredFile = await ImageCropper().recoverImage();
+    if (recoveredFile != null && mounted) {
+      setState(() {
+        _croppedFile = recoveredFile;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: !kIsWeb ? AppBar(title: Text(widget.title)) : null,
@@ -280,7 +295,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _cropImage() async {
     if (_pickedFile != null) {
-      final croppedFile = await ImageCropper().cropImage(
+      final cropper = ImageCropper();
+      final croppedFile = await cropper.cropImage(
         sourcePath: _pickedFile!.path,
         compressFormat: ImageCompressFormat.jpg,
         compressQuality: 100,
