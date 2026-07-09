@@ -19,16 +19,20 @@
 #### pubspec.yaml
 
 ```yaml
-...
 
 dependencies:
   image_cropper:
     git: 
       url: https://gitcode.com/CPF-Flutter/fluttertpc_image_cropper.git
       path: ./image_cropper
-      ref: br_v11.0.0_ohos
+      ref: TAG #根据框架版本选择TAG
 
-...
+#3.7 框架版本使用下面配置：
+  imagecropper_ohos:
+    git: 
+      url: https://gitcode.com/CPF-Flutter/fluttertpc_image_cropper.git
+      path: ./image_cropper/ohos
+      ref: master
 ```
 
 执行命令
@@ -36,6 +40,13 @@ dependencies:
 ```bash
 flutter pub get
 ```
+
+| Flutter 框架版本  | TAG 名称                | 分支名 |
+| ---------------- | ----------------------- | ---- |
+| 3.7              | 6.0.0-ohos-1.0.0-beta.1 | master |
+| 3.22             | 8.0.2-ohos-1.0.0-beta.1 |br_v8.0.2_ohos |
+| 3.27             | 9.1.0-ohos-1.0.0-beta.1 |br_v9.1.0_ohos |
+| 3.35             | 11.0.0-ohos-1.0.0-beta.1 | br_v11.0.0_ohos |
 
 <!-- tabs:end -->
 
