@@ -32,7 +32,7 @@ dependencies:
     git: 
       url: https://gitcode.com/CPF-Flutter/fluttertpc_image_cropper.git
       path: ./image_cropper/ohos
-      ref: master
+      ref: 6.0.0-ohos-1.0.0-beta.1
 ```
 
 Execute Command
