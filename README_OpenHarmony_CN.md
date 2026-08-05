@@ -32,7 +32,7 @@ dependencies:
     git: 
       url: https://gitcode.com/CPF-Flutter/fluttertpc_image_cropper.git
       path: ./image_cropper/ohos
-      ref: master
+      ref: 6.0.0-ohos-1.0.0-beta.1
 ```
 
 执行命令
@@ -46,7 +46,7 @@ flutter pub get
 | 3.7              | 6.0.0-ohos-1.0.0-beta.1 | master |
 | 3.22             | 8.0.2-ohos-1.0.0-beta.1 |br_v8.0.2_ohos |
 | 3.27             | 9.1.0-ohos-1.0.0-beta.1 |br_v9.1.0_ohos |
-| 3.35             | 11.0.0-ohos-1.0.0-beta.1 | br_v11.0.0_ohos |
+| 3.35             | 11.0.0-ohos-1.0.0| br_v11.0.0_ohos |
 
 <!-- tabs:end -->
 
