@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'dart:io';
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -149,59 +148,21 @@ class MethodChannelImagecropperOhos extends ImageCropperPlatform {
     assert(maxHeight == null || maxHeight > 0);
     assert(compressQuality >= 0 && compressQuality <= 100);
 
-    final arguments = <String, dynamic>{
-      'source_path': sourcePath,
-      'max_width': maxWidth,
-      'max_height': maxHeight,
-      'ratio_x': aspectRatio?.ratioX,
-      'ratio_y': aspectRatio?.ratioY,
-      'compress_format': compressFormat.name,
-      'compress_quality': compressQuality,
-    };
-    BuildContext? extractedContext;
-    if (uiSettings != null) {
-      for (final settings in uiSettings) {
-        arguments.addAll(settings.toMap());
-        if (settings is WebUiSettings && settings.context != null) {
-            extractedContext = settings.context;
-              break; 
-        }
+    BuildContext? cropContext = context;
+    for (final settings in uiSettings ?? const <PlatformUiSettings>[]) {
+      if (settings is WebUiSettings) {
+        cropContext ??= settings.context;
+        break;
       }
     }
-    final contextToUse = context ?? extractedContext;
-     if ( contextToUse != null) {
-      // 鸿蒙平台的处理逻辑
-      final completer = Completer<CroppedFile?>();
-    
-      try {
-        final result = await Navigator.push<String?>(
-          contextToUse,
-          MaterialPageRoute(
-            builder: (contextToUse) => CropWidget(
-              imagePath: sourcePath,
-              onCropped: (String? croppedPath) {
-                if (croppedPath != null) {
-                  completer.complete(CroppedFile(croppedPath));
-                } else {
-                  completer.complete(null);
-                }
-              },
-            ),
-          ),
-        );
-        
-        // 如果 Navigator.push 直接返回结果
-        if (result != null) {
-          return CroppedFile(result);
-        }
-        
-        // 等待 completer 完成
-        return await completer.future;
-      } catch (e) {
-        return null;
-      }
-    }
-    return null;
+    if (cropContext == null || !cropContext.mounted) return null;
+
+    final path = await Navigator.of(cropContext).push<String>(
+      MaterialPageRoute<String>(
+        builder: (_) => CropWidget(imagePath: sourcePath),
+      ),
+    );
+    return path == null ? null : CroppedFile(path);
   }
 
   @override

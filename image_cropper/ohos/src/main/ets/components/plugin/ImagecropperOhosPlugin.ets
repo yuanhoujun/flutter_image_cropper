@@ -194,6 +194,7 @@ export default class ImagecropPlugin implements FlutterPlugin, MethodCallHandler
       }
       result.success(dstFile);
     } catch (e) {
+      result.error("CROP_FAILED", "Failed to crop the selected image", null);
     }
   }
 

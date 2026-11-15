@@ -6,12 +6,10 @@ import 'dart:io';
 
 class CropWidget extends StatefulWidget {
   final String imagePath;
-  final Function(String?) onCropped;
 
   const CropWidget({
     Key? key,
     required this.imagePath,
-    required this.onCropped,
   }) : super(key: key);
 
   @override
@@ -58,6 +56,7 @@ class _CropWidgetState extends State<CropWidget> {
         path: widget.imagePath,
         maximumSize: 1024,
       );
+      if (!mounted) return;
       setState(() {
         _sampleFile = sampleFile;
       });
@@ -479,9 +478,10 @@ class _CropWidgetState extends State<CropWidget> {
       );
       
       print('cropImage 调用成功，结果：${croppedFile.path}');
-      widget.onCropped(croppedFile.path);
+      if (!mounted) return;
       Navigator.of(context).pop(croppedFile.path);
     } catch (e) {
+      if (!mounted) return;
       print('cropImage 调用失败，错误：$e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -491,9 +491,11 @@ class _CropWidgetState extends State<CropWidget> {
       );
     } finally {
       print('设置 _isProcessing = false');
-      setState(() {
-        _isProcessing = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isProcessing = false;
+        });
+      }
     }
     print('=== _cropImage 执行结束 ===');
   }
