@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image_cropper_platform_interface/src/models/cropped_file/crop_page.dart';
 import 'package:image_cropper_platform_interface/image_cropper_platform_interface.dart';
 
 void main() {
@@ -20,6 +21,9 @@ void main() {
       String? result;
       MethodChannelImagecropperOhos().cropImage(
         sourcePath: source.path,
+        aspectRatio: action == 'confirm'
+            ? const CropAspectRatio(ratioX: 1, ratioY: 1)
+            : null,
         uiSettings: [WebUiSettings(context: page)],
       ).then((file) {
         completed = true;
@@ -30,6 +34,9 @@ void main() {
       await tester.pump(const Duration(milliseconds: 350));
       expect(find.text('Crop Image'), findsOneWidget);
       expect(completed, isFalse);
+      final cropPage = tester.widget<CropWidget>(find.byType(CropWidget));
+      expect(cropPage.fixedAspectRatio, action == 'confirm' ? 1.0 : isNull);
+      expect(find.text('4:3'), action == 'confirm' ? findsNothing : findsOneWidget);
 
       if (action == 'close') {
         await tester.tap(find.byIcon(Icons.close));

@@ -159,7 +159,12 @@ class MethodChannelImagecropperOhos extends ImageCropperPlatform {
 
     final path = await Navigator.of(cropContext).push<String>(
       MaterialPageRoute<String>(
-        builder: (_) => CropWidget(imagePath: sourcePath),
+        builder: (_) => CropWidget(
+          imagePath: sourcePath,
+          fixedAspectRatio: aspectRatio == null
+              ? null
+              : aspectRatio.ratioX / aspectRatio.ratioY,
+        ),
       ),
     );
     return path == null ? null : CroppedFile(path);

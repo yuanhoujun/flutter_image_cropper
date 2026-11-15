@@ -6,10 +6,12 @@ import 'dart:io';
 
 class CropWidget extends StatefulWidget {
   final String imagePath;
+  final double? fixedAspectRatio;
 
   const CropWidget({
     Key? key,
     required this.imagePath,
+    this.fixedAspectRatio,
   }) : super(key: key);
 
   @override
@@ -38,6 +40,7 @@ class _CropWidgetState extends State<CropWidget> {
   @override
   void initState() {
     super.initState();
+    if (widget.fixedAspectRatio != null) _selectedTabIndex = 1;
     _rotateController = RotateController();
     _scaleController = ScaleController(); // 初始化缩放控制器
     _sampleImage();
@@ -140,7 +143,7 @@ class _CropWidgetState extends State<CropWidget> {
           child: Crop(
             key: _cropKey,
             image: FileImage(_sampleFile!),
-            aspectRatio: _currentAspectRatio,
+            aspectRatio: widget.fixedAspectRatio ?? _currentAspectRatio,
             rotateController: _rotateController,
             scaleController: _scaleController, // 传递缩放控制器
             initialScale: _currentScale,
@@ -202,12 +205,13 @@ class _CropWidgetState extends State<CropWidget> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildUCropTabButton(
-                  icon: Icons.crop,
-                  label: '裁剪',
-                  index: 0,
-                  onPressed: () => _selectTab(0),
-                ),
+                if (widget.fixedAspectRatio == null)
+                  _buildUCropTabButton(
+                    icon: Icons.crop,
+                    label: '裁剪',
+                    index: 0,
+                    onPressed: () => _selectTab(0),
+                  ),
                 _buildUCropTabButton(
                   icon: Icons.rotate_right,
                   label: '旋转',
